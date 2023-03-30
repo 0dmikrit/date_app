@@ -1,4 +1,6 @@
 from tkinter import *
+from tkcalendar import DateEntry
+from datetime import datetime
 
 
 class Person(Tk):
@@ -15,36 +17,36 @@ class Person(Tk):
 
 class MainWindow(Frame):
     def __init__(self, parent):
-        super().__init__()
+        super().__init__(parent)
         self._name = StringVar()
         self._surname = StringVar()
+        self._date = StringVar()
         self.entry_res = Label(self)
         self.entry_res.pack()
-        self.res = f'{self._name.get()} {self._surname.get()} в возрасте 17 лет'
         self.put_widgets()
 
     def press(self):
-    	self.res = f'{self._name.get()} {self._surname.get()} в возрасте 17 лет' 
-    	FinishWindow().mainloop()
+        today = datetime.today().date()
+        birthdate = datetime.strptime(self._date.get(), "%Y-%m-%d").date()
+        age = today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
+        res = f'{self._name.get()} {self._surname.get()} в возрасте {age} лет'
+        FinishWindow(res)
 
     def put_widgets(self):
-        self.text = Label(self, text='Введите имя, фамилию и дату рождения сотрудника.').pack()
-        self.entry_name = Entry(self, textvariable=self._name).pack()
-        self.entry_surname = Entry(self, textvariable=self._surname).pack()
-        self.but = Button(self, text='Отобразить запись', command=self.press).pack()
+        Label(self, text='Введите имя, фамилию и дату рождения сотрудника.').pack()
+        Entry(self, textvariable=self._name).pack()
+        Entry(self, textvariable=self._surname).pack()
+        DateEntry(self, textvariable=self._date, date_pattern='yyyy-mm-dd').pack()
+        Button(self, text='Отобразить запись', command=self.press).pack()
 
 
-class FinishWindow(Tk):
-	def __init__(self):
-		super().__init__()
-		self.title('My person class')
-		self.geometry('250x150')
-		help = MainWindow(parent=Person)
-		self.mess = help.res
-		print(help.res)
-        self.dres = Label(self, text=self.mess)
-        self.dres.pack()
-
+class FinishWindow(Toplevel):
+    def __init__(self, res):
+        super().__init__()
+        self.title('My person class')
+        self.geometry('250x150')
+        Label(self, text=res).pack()
+        self.mainloop()
 
 
 if __name__ == '__main__':
